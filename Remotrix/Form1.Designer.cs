@@ -34,8 +34,8 @@
             this.baseAddress = new System.Windows.Forms.TextBox();
             this.Login = new System.Windows.Forms.TextBox();
             this.Password = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.ConnectButton = new System.Windows.Forms.Button();
+            this.StartQuery = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Results)).BeginInit();
             this.SuspendLayout();
             // 
@@ -91,32 +91,32 @@
             this.Password.TabIndex = 4;
             this.Password.Text = "Napopravku.ru123";
             // 
-            // button1
+            // ConnectButton
             // 
-            this.button1.Location = new System.Drawing.Point(12, 38);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(137, 20);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.ConnectButton.Location = new System.Drawing.Point(12, 38);
+            this.ConnectButton.Name = "ConnectButton";
+            this.ConnectButton.Size = new System.Drawing.Size(137, 20);
+            this.ConnectButton.TabIndex = 5;
+            this.ConnectButton.Text = "Подключиться";
+            this.ConnectButton.UseVisualStyleBackColor = true;
+            this.ConnectButton.Click += new System.EventHandler(this.Connect_Click);
             // 
-            // button2
+            // StartQuery
             // 
-            this.button2.Location = new System.Drawing.Point(155, 38);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(137, 20);
-            this.button2.TabIndex = 5;
-            this.button2.Text = "button1";
-            this.button2.UseVisualStyleBackColor = true;
+            this.StartQuery.Location = new System.Drawing.Point(155, 38);
+            this.StartQuery.Name = "StartQuery";
+            this.StartQuery.Size = new System.Drawing.Size(137, 20);
+            this.StartQuery.TabIndex = 5;
+            this.StartQuery.Text = "Выполнить";
+            this.StartQuery.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1341, 832);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.StartQuery);
+            this.Controls.Add(this.ConnectButton);
             this.Controls.Add(this.Password);
             this.Controls.Add(this.Login);
             this.Controls.Add(this.baseAddress);
@@ -139,8 +139,8 @@
         private System.Windows.Forms.TextBox baseAddress;
         private System.Windows.Forms.TextBox Login;
         private System.Windows.Forms.TextBox Password;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button ConnectButton;
+        private System.Windows.Forms.Button StartQuery;
     }
 }
 
