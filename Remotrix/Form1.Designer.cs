@@ -28,43 +28,47 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.Results = new System.Windows.Forms.DataGridView();
-            this.QueryBox = new System.Windows.Forms.RichTextBox();
             this.baseAddress = new System.Windows.Forms.TextBox();
             this.Login = new System.Windows.Forms.TextBox();
             this.Password = new System.Windows.Forms.TextBox();
             this.ConnectButton = new System.Windows.Forms.Button();
             this.StartQuery = new System.Windows.Forms.Button();
+            this.QueryBox = new FastColoredTextBoxNS.FastColoredTextBox();
+            this.TreeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.Select = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.Results)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.QueryBox)).BeginInit();
+            this.TreeContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // treeView1
             // 
+            this.treeView1.ContextMenuStrip = this.TreeContextMenu;
             this.treeView1.Location = new System.Drawing.Point(12, 73);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(255, 747);
+            this.treeView1.Size = new System.Drawing.Size(252, 747);
             this.treeView1.TabIndex = 0;
+            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
             // Results
             // 
             this.Results.AllowUserToAddRows = false;
             this.Results.AllowUserToDeleteRows = false;
+            this.Results.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
             this.Results.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.Results.GridColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.Results.Location = new System.Drawing.Point(268, 471);
             this.Results.Name = "Results";
             this.Results.ReadOnly = true;
-            this.Results.Size = new System.Drawing.Size(1061, 348);
+            this.Results.RowTemplate.ReadOnly = true;
+            this.Results.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.Results.Size = new System.Drawing.Size(1061, 349);
             this.Results.TabIndex = 1;
-            // 
-            // QueryBox
-            // 
-            this.QueryBox.AcceptsTab = true;
-            this.QueryBox.Location = new System.Drawing.Point(269, 73);
-            this.QueryBox.Name = "QueryBox";
-            this.QueryBox.Size = new System.Drawing.Size(1060, 392);
-            this.QueryBox.TabIndex = 2;
-            this.QueryBox.Text = "";
+            this.Results.VirtualMode = true;
             // 
             // baseAddress
             // 
@@ -109,23 +113,86 @@
             this.StartQuery.TabIndex = 5;
             this.StartQuery.Text = "Выполнить";
             this.StartQuery.UseVisualStyleBackColor = true;
+            this.StartQuery.Click += new System.EventHandler(this.StartQuery_Click);
+            // 
+            // QueryBox
+            // 
+            this.QueryBox.AllowSeveralTextStyleDrawing = true;
+            this.QueryBox.AutoCompleteBrackets = true;
+            this.QueryBox.AutoCompleteBracketsList = new char[] {
+        '(',
+        ')',
+        '{',
+        '}',
+        '[',
+        ']',
+        '\"',
+        '\"',
+        '\'',
+        '\''};
+            this.QueryBox.AutoIndentCharsPatterns = "^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;=]+);\r\n^\\s*(case|default)\\s*[^:]*" +
+    "(?<range>:)\\s*(?<range>[^;]+);";
+            this.QueryBox.AutoScrollMinSize = new System.Drawing.Size(27, 14);
+            this.QueryBox.BackBrush = null;
+            this.QueryBox.BackColor = System.Drawing.SystemColors.Window;
+            this.QueryBox.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.QueryBox.ChangedLineColor = System.Drawing.Color.Gainsboro;
+            this.QueryBox.CharHeight = 14;
+            this.QueryBox.CharWidth = 8;
+            this.QueryBox.CommentPrefix = "--";
+            this.QueryBox.CurrentPenSize = 3;
+            this.QueryBox.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.QueryBox.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.QueryBox.DocumentPath = null;
+            this.QueryBox.Font = new System.Drawing.Font("Courier New", 9.75F);
+            this.QueryBox.IsReplaceMode = false;
+            this.QueryBox.Language = FastColoredTextBoxNS.Language.SQL;
+            this.QueryBox.Location = new System.Drawing.Point(270, 75);
+            this.QueryBox.Name = "QueryBox";
+            this.QueryBox.Paddings = new System.Windows.Forms.Padding(0);
+            this.QueryBox.SelectionChangedDelayedEnabled = false;
+            this.QueryBox.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+            this.QueryBox.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("QueryBox.ServiceColors")));
+            this.QueryBox.ShowFoldingLines = true;
+            this.QueryBox.Size = new System.Drawing.Size(1059, 390);
+            this.QueryBox.TabIndex = 6;
+            this.QueryBox.VirtualSpace = true;
+            this.QueryBox.WideCaret = true;
+            this.QueryBox.Zoom = 100;
+            // 
+            // TreeContextMenu
+            // 
+            this.TreeContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.Select});
+            this.TreeContextMenu.Name = "TreeContextMenu";
+            this.TreeContextMenu.Size = new System.Drawing.Size(180, 26);
+            // 
+            // Select
+            // 
+            this.Select.Name = "Select";
+            this.Select.Size = new System.Drawing.Size(179, 22);
+            this.Select.Text = "Select TOP 200 rows";
+            this.Select.Click += new System.EventHandler(this.Select_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1341, 832);
+            this.Controls.Add(this.QueryBox);
             this.Controls.Add(this.StartQuery);
             this.Controls.Add(this.ConnectButton);
             this.Controls.Add(this.Password);
             this.Controls.Add(this.Login);
             this.Controls.Add(this.baseAddress);
-            this.Controls.Add(this.QueryBox);
             this.Controls.Add(this.Results);
             this.Controls.Add(this.treeView1);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.SizeChanged += new System.EventHandler(this.Form1_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.Results)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.QueryBox)).EndInit();
+            this.TreeContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -135,12 +202,14 @@
 
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.DataGridView Results;
-        private System.Windows.Forms.RichTextBox QueryBox;
         private System.Windows.Forms.TextBox baseAddress;
         private System.Windows.Forms.TextBox Login;
         private System.Windows.Forms.TextBox Password;
         private System.Windows.Forms.Button ConnectButton;
         private System.Windows.Forms.Button StartQuery;
+        private FastColoredTextBoxNS.FastColoredTextBox QueryBox;
+        private System.Windows.Forms.ContextMenuStrip TreeContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem Select;
     }
 }
 

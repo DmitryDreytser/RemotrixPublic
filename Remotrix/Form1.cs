@@ -11,113 +11,110 @@ using System.Windows.Forms;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using FastColoredTextBoxNS;
 
 namespace Remotrix
 {
+    
     public partial class Form1 : Form
     {
-        HttpClient connection = new HttpClient();
-        private string SessionID = null;
+        Remotrix dB = null;
+        AutocompleteMenu acMenu = null;
+        AutoCompleteStringCollection AutoCompleteStrings = new AutoCompleteStringCollection();
 
         public Form1()
         {
             InitializeComponent();
+            StartQuery.Enabled = false;
+            acMenu = new AutocompleteMenu(QueryBox);
+                    //acLV = new AutocompleteListView(); 
+            acMenu.Show();
         }
 
-        private async Task<DataTable> ExecQuery(string Query)
+        private async void FillTables(DataTable data)
         {
-            var result = await connection.PostAsync("/bitrix/admin/sql.php?PAGEN_1=1&SHOWALL_1=1&lang=ru&mode=frame&table_id=tbl_sql",
-                new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    {"query", "SELECT * FROM INFORMATION_SCHEMA.TABLES"},
-                    {"sessid", SessionID}
-                }));
 
-            var resp = await result.Content.ReadAsStringAsync();
+            treeView1.Nodes.AddRange(data.AsEnumerable().Select(x => x["TABLE_SCHEMA"].ToString()).Distinct().Select(x => new TreeNode(x,
+                data.AsEnumerable().Where(c => c["TABLE_SCHEMA"].ToString() == x).Select(c => new TreeNode($"{c["TABLE_NAME"]} [{c["TABLE_ROWS"]}]") { Tag = c["TABLE_NAME"] }
+                ).OrderBy(t => t.Text).ToArray()
+                )
+            { Name = x }).ToArray());
 
-            DataTable data = new DataTable();
-            using (var context = (BrowsingContext)BrowsingContext.New(Configuration.Default))
+            acMenu.Items.SetAutocompleteItems(data.AsEnumerable().Select(x => x["TABLE_SCHEMA"].ToString()).Distinct().ToArray());
+
+
+            Parallel.ForEach(treeView1.Nodes.Cast<TreeNode>(), async (TreeNode par) =>
             {
-                using (var document = await context.OpenAsync(req => req.Content(resp)))
+                Parallel.ForEach(par.Nodes.Cast<TreeNode>(), async (TreeNode item) =>
                 {
-                    document.Domain = this.baseAddress.Text;
-                    var header = ((IHtmlTableElement) document.QuerySelector("table#tbl_sql")).Head;
-                    foreach (var row in rows)
-                    {
+                    item.TreeView.BeginInvoke((MethodInvoker)async delegate
+                   {
+                       var Fields = await dB.ExecQuery($"DESCRIBE {item.Parent.Text}.{item.Tag}");
+                       item.Nodes.AddRange(Fields.AsEnumerable().Select(f => new TreeNode($"{f[0]} [{f[1]}]") { Tag = f[0]}).ToArray());
+                       acMenu.Items.SetAutocompleteItems(Fields.AsEnumerable().Select(f => $"{f[0]}").ToArray());
+                       acMenu.Items.SetAutocompleteItems(new List<string> { item.Parent.Text, item.Tag.ToString() });
+                       //acLV.SetAutocompleteItems({ item.Parent.Text});
+                       //acLV.SetAutocompleteItems();
+                   });
+                });
+            });
 
-                    }
-
-                    var rows = ((IHtmlTableElement) document.QuerySelector("table#tbl_sql")).Bodies[0].Rows;
-                    foreach (var row in rows)
-                    {
-                        var datarow = data.NewRow();
-                        foreach (var cell in row.Cells)
-                        {
-                            datarow.
-                        }
-                    }
-                }
-            }
-
-            return data;
+            StartQuery.Enabled = true;
         }
 
         private async void Connect_Click(object sender, EventArgs e)
         {
-            connection.BaseAddress = new Uri(this.baseAddress.Text);
-            var result = await connection.GetAsync("/bitrix/admin/");
-            var resp = await result.Content.ReadAsStringAsync();
-            string SessionID;
+            dB = new Remotrix(baseAddress.Text, Login.Text, Password.Text);
+            await dB.Connect();
 
-            using (var context = (BrowsingContext)BrowsingContext.New(Configuration.Default))
-            {
-                using (var document = await context.OpenAsync(req => req.Content(resp)))
-                {
-                    document.Domain = this.baseAddress.Text;
-                    SessionID = ((IHtmlInputElement)document.QuerySelector("input#sessid")).Value;
-                }
-            }
-
-            var auth = new Dictionary<string, string>
-            {
-                {"AUTH_FORM", "Y"},
-                {"Login", "yes"},
-                {"TYPE", "AUTH"},
-                {"USER_LOGIN", Login.Text},
-                {"USER_PASSWORD", Password.Text},
-                {"captcha_sid", ""},
-                {"captcha_word", ""},
-                {"sessid", SessionID},
-            };
-
-            result = await connection.PostAsync("/bitrix/admin/?login=yes", new FormUrlEncodedContent(auth));
-            resp = await result.Content.ReadAsStringAsync();
+            var data = await dB.ExecQuery("SELECT * FROM INFORMATION_SCHEMA.TABLES");
+            QueryBox.Text = dB.LastQuery;
+            Results.DataSource = data;
+            FillTables(data);
             
-                
-            result = await connection.PostAsync("/bitrix/admin/sql.php?PAGEN_1=1&SHOWALL_1=1&lang=ru&mode=frame&table_id=tbl_sql", 
-                new FormUrlEncodedContent(new Dictionary<string, string> 
-                {
-                    {"query", "SELECT * FROM INFORMATION_SCHEMA.TABLES"},
-                    {"sessid", SessionID}
-                } ));
+         }
 
-            resp = await result.Content.ReadAsStringAsync();
-
-            using (var context = (BrowsingContext)BrowsingContext.New(Configuration.Default))
+        private async void StartQuery_Click(object sender, EventArgs e)
+        {
+            StartQuery.Enabled = false;
+            try
             {
-                using (var document = await context.OpenAsync(req => req.Content(resp)))
-                {
-                    document.Domain = this.baseAddress.Text;
-                    var t = ((IHtmlTableElement)document.QuerySelector("table#tbl_sql"));
-
-                    Results.DataSource = t.Rows.ToCollection();
-                }
+                Results.DataSource = await dB.ExecQuery(QueryBox.Text);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                StartQuery.Enabled = true;
+            }
+        }
 
-            QueryBox.Text = resp;
+        private void Form1_SizeChanged(object sender, EventArgs e)
+        {
+            Results.Width = this.Width - treeView1.Width - 40;
+            QueryBox.Width = this.Width - treeView1.Width - 40;
+            Results.Height = this.Height - QueryBox.Height - 140;
+            treeView1.Height = Results.Bottom - QueryBox.Top;
+        }
 
+        private async void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            var item = e.Node;
+            if (item.Level == 1 && item.Nodes.Count == 0)
+            {
+               e.Node.Nodes.AddRange( (await dB.ExecQuery($"DESCRIBE {item.Parent.Text}.{item.Text}")).AsEnumerable().Select(f => new TreeNode(f[0].ToString())).ToArray());
+            }
+        
+        }
 
-
+        private void Select_Click(object sender, EventArgs e)
+        {
+            if(treeView1.SelectedNode.Level == 1)
+            {
+                QueryBox.Text = $"SELECT\r\n{String.Join(",\r\n", treeView1.SelectedNode.Nodes.Cast<TreeNode>().Select(x => $"\t{treeView1.SelectedNode.Tag}.{x.Tag} as {x.Tag}"))}\r\nFROM {treeView1.SelectedNode.Parent.Text}.{treeView1.SelectedNode.Tag} AS {treeView1.SelectedNode.Tag} LIMIT 200";
+            }
         }
     }
 }
