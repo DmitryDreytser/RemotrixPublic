@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
@@ -16,6 +11,10 @@ namespace Remotrix
 {
     public class Remotrix
     {
+        public delegate void onParseProgress(float progress);
+
+        public event onParseProgress OnParseProgress;
+
         public List<DataTable> Schema = new List<DataTable>();
 
         public string LastQuery = null;
@@ -94,7 +93,7 @@ namespace Remotrix
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+               
             }
             return new DataTable();
         }
@@ -133,6 +132,7 @@ namespace Remotrix
                     }
 
                     var rows = ((IHtmlTableElement)document.QuerySelector("table#tbl_sql")).Bodies[0].Rows;
+                    float totalRows = rows.Length;
                     foreach (var row in rows)
                     {
                         var datarow = data.NewRow();
@@ -142,6 +142,7 @@ namespace Remotrix
                             datarow[i++] = cell.Text();
                         }
                         data.Rows.Add(datarow);
+                        OnParseProgress?.Invoke(data.Rows.Count / totalRows);
                     }
 
                     time = float.Parse(document.QuerySelector("div.adm-info-message").QuerySelector("b").InnerHtml.Replace(".", ","));

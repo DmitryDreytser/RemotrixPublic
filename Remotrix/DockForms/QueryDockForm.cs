@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-//using FastColoredTextBoxNS;
+﻿//using FastColoredTextBoxNS;
 using ScintillaNET;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Remotrix.DockForms
 {
@@ -37,9 +29,9 @@ namespace Remotrix.DockForms
 
         private void OnTextChanged(object sender, EventArgs e)
         {
-            
+
         }
-       
+
 
         /// <summary>
         /// the background color of the text area
@@ -91,7 +83,7 @@ namespace Remotrix.DockForms
 
         private void TextArea_MarginClick(object sender, MarginClickEventArgs e)
         {
-            
+
         }
 
         public static Color IntToColor(int rgb)
@@ -118,7 +110,7 @@ namespace Remotrix.DockForms
             TextArea.Styles[Style.Default].ForeColor = IntToColor(0x212121);
             TextArea.StyleClearAll();
 
-           // TextArea.Margins[0].Width = 20;
+            // TextArea.Margins[0].Width = 20;
 
             // Configure the CPP (C#) lexer styles
             // Set the Styles
@@ -143,7 +135,7 @@ namespace Remotrix.DockForms
             // Word2 = 1
             TextArea.SetKeywords(1, @"ascii cast char charindex ceiling coalesce collate contains convert current_date current_time current_timestamp current_user floor isnull max min nullif object_id session_user substring system_user tsequal ");
             // User1 = 4
-            TextArea.SetKeywords(4,@"all and any between cross exists in inner is join left like not null or outer pivot right some unpivot ( ) * ");
+            TextArea.SetKeywords(4, @"all and any between cross exists in inner is join left like not null or outer pivot right some unpivot ( ) * ");
             // User2 = 5
             SetUserKeyword(@"sys objects sysobjects ");
         }
